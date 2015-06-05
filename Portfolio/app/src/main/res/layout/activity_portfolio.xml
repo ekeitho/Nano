@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="Large Text"
+        android:text="@string/title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout
@@ -23,19 +23,19 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/scoresApp"
+            android:id="@+id/spotifyButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#F08C35"
             android:text="@string/spotify_title" />
 
         <Button
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-
             android:id="@+id/scoresAppButton"
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:background="#F08C35"
             android:text="@string/scores_title" />
 
@@ -47,30 +47,32 @@
             android:text="@string/library_title" />
 
         <Button
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-
             android:id="@+id/buildBiggerButton"
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:background="#F08C35"
             android:text="@string/build_bigger_title" />
 
         <Button
-            android:id="@+id/xyzBaconReaderButton"
+            android:id="@+id/xyzButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#F08C35"
             android:text="@string/xyz_title" />
 
         <Button
-            android:layout_marginTop="10dp"
-
             android:id="@+id/myOwnAppButton"
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:background="#AE4021"
-            android:text="@string/capstone_title" />
+            android:padding="16dp"
+            android:text="@string/capstone_title"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
 </RelativeLayout>
