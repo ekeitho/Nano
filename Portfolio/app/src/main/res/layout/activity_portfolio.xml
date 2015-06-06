@@ -36,14 +36,14 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:background="#F08C35"
+            android:background="@color/orange"
             android:text="@string/scores_title" />
 
         <Button
             android:id="@+id/libraryAppButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#F08C35"
+            android:background="@color/orange"
             android:text="@string/library_title" />
 
         <Button
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:background="#F08C35"
+            android:background="@color/orange"
             android:text="@string/build_bigger_title" />
 
         <Button
@@ -69,10 +69,10 @@
 
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="#AE4021"
+            android:background="@color/red"
             android:padding="16dp"
             android:text="@string/capstone_title"
-            android:textColor="#FFFFFF" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </RelativeLayout>
