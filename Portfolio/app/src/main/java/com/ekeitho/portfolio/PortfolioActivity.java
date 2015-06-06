@@ -58,7 +58,7 @@ public class PortfolioActivity extends ActionBarActivity implements View.OnClick
     public void displayToast(View view) {
         Button button = (Button) view;
         String buttonText = (String) button.getText();
-        String text = getString(R.string.click_intro) + buttonText;
+        String text = getString(R.string.click_intro) + " " + buttonText + "!";
 
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
