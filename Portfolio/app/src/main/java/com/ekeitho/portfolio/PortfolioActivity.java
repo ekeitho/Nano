@@ -1,5 +1,6 @@
 package com.ekeitho.portfolio;
 
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -48,32 +49,20 @@ public class PortfolioActivity extends ActionBarActivity implements View.OnClick
     }
 
 
-
     @Override
     public void onClick(View v) {
-
-        switch(v.getId()) {
-            case R.id.spotifyButton:
-                toastie("You clicked my spotify button!");
-                break;
-            case R.id.scoresAppButton:
-                toastie("You clicked my scores button!");
-                break;
-            case R.id.libraryAppButton:
-                toastie("You clicked my library button!");
-                break;
-            case R.id.buildBiggerButton:
-                toastie("You clicked my build bigger button!");
-                break;
-            case R.id.xyzButton:
-                toastie("You clicked my xyz button!");
-                break;
-            case R.id.myOwnAppButton:
-                toastie("This button will launch by capstone app!");
-                break;
-        }
-
+        /* thanks to the constructive criticism from udacity on this one */
+        displayToast(v);
     }
+
+    public void displayToast(View view) {
+        Button button = (Button) view;
+        String buttonText = (String) button.getText();
+        String text = getString(R.string.click_intro) + buttonText;
+
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -90,8 +79,5 @@ public class PortfolioActivity extends ActionBarActivity implements View.OnClick
         return super.onOptionsItemSelected(item);
     }
 
-    private void toastie(String string) {
-        Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
-    }
 
 }
