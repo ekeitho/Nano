@@ -24,53 +24,37 @@
 
         <Button
             android:id="@+id/spotifyButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/orange"
-            android:text="@string/spotify_title" />
+            android:text="@string/spotify_title"
+            style="@style/udacity_projects" />
 
         <Button
             android:id="@+id/scoresAppButton"
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/orange"
-            android:text="@string/scores_title" />
+            android:text="@string/scores_title"
+            style="@style/udacity_projects_padding" />
 
         <Button
             android:id="@+id/libraryAppButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/orange"
-            android:text="@string/library_title" />
+            android:text="@string/library_title"
+            style="@style/udacity_projects" />
 
         <Button
             android:id="@+id/buildBiggerButton"
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/orange"
-            android:text="@string/build_bigger_title" />
+            android:text="@string/build_bigger_title"
+            style="@style/udacity_projects_padding" />
 
         <Button
             android:id="@+id/xyzButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/orange"
-            android:text="@string/xyz_title" />
+            android:text="@string/xyz_title"
+            style="@style/udacity_projects"
+            />
 
         <Button
+            android:layout_marginTop="10dp"
+            android:padding="16dp"
             android:id="@+id/myOwnAppButton"
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:background="@color/red"
-            android:padding="16dp"
             android:text="@string/capstone_title"
             android:textColor="@color/white" />
     </LinearLayout>
