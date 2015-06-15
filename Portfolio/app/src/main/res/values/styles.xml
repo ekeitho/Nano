@@ -11,12 +11,9 @@
         <item name="android:background">@color/orange</item>
     </style>
 
-    <style name="udacity_projects_padding">
+    <style name="udacity_projects_padding" parent="udacity_projects">
         <item name="android:layout_marginBottom">10dp</item>
         <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@color/orange</item>
     </style>
 
 
