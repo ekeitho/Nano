@@ -1,4 +1,4 @@
-package com.ekeitho.spotify.view;
+package com.ekeitho.spotify.top10;
 
 import android.app.Activity;
 import android.os.Bundle;

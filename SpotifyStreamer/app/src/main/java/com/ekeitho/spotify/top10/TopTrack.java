@@ -1,4 +1,4 @@
-package com.ekeitho.spotify.model;
+package com.ekeitho.spotify.top10;
 
 import android.os.Parcel;
 import android.os.Parcelable;
