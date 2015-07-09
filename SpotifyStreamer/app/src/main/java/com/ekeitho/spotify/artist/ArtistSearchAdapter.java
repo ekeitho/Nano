@@ -1,15 +1,21 @@
 package com.ekeitho.spotify.artist;
 
+
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.ekeitho.spotify.R;
 import com.ekeitho.spotify.SpotifyActivity;
 import com.ekeitho.spotify.top10.TopTrack;
-import com.ekeitho.spotify.top10.Top10;
+import com.ekeitho.spotify.top10.Top10Fragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,54 +34,72 @@ import retrofit.client.Response;
 public class ArtistSearchAdapter extends ArrayAdapter<Artist> implements View.OnClickListener {
 
     private SpotifyActivity activity;
+    private ArtistSearchAdapter adapter = this;
+    private FragmentManager manager;
+    private ArtistView artistView;
 
     public ArtistSearchAdapter(Context context, ArrayList<Artist> users) {
         super(context, 0, users);
         // attach to activity
         activity = (SpotifyActivity)getContext();
+        manager = activity.getSupportFragmentManager();
     }
 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // get the artist
-        ArtistView artistView = (ArtistView) convertView;
+        artistView = (ArtistView) convertView;
 
         if (artistView == null) {
             artistView = ArtistView.inflate(parent);
         }
+
+        artistView.setOnClickListener(this);
 
         artistView.setArtist(getItem(position));
 
         return artistView;
     }
 
+    public TopTrack trackToTopTrack(Track track) {
+        String url = null;
+
+        if (track.album.images != null && track.album.images.size() > 0) {
+            url = track.album.images.get(0).url;
+        }
+        else {
+            Log.e("TopTrack", "didn't get this song album image: " + track.name);
+        }
+        return new TopTrack(track.name, track.album.name, url, track.preview_url);
+    }
+
     public void onClick(View v) {
         Map<String, Object> map = new HashMap<>();
         map.put("country", "US");
+        final ArtistView view = (ArtistView) v;
 
-        activity.spotify.getArtistTopTrack((String) v.getTag(), map, new Callback<Tracks>() {
+        activity.spotify.getArtistTopTrack(view.getArtistId(), map, new Callback<Tracks>() {
             @Override
             public void success(Tracks tracks, Response response) {
                 ArrayList<TopTrack> topTracks = new ArrayList<TopTrack>();
 
-                for (Track t : tracks.tracks) {
-                    String url = "";
 
-                    if (t.album.images != null && t.album.images.size() > 0) {
-                        url = t.album.images.get(0).url;
-                    }
-
-                    TopTrack track = new TopTrack(t.name, t.album.name, url, t.preview_url);
-                    topTracks.add(track);
+                for (Track track : tracks.tracks) {
+                    // transform to my toptrack object and add to array list
+                    topTracks.add(adapter.trackToTopTrack(track));
                 }
 
-
-                Intent intent = new Intent(getContext(), Top10.class);
-                intent.putParcelableArrayListExtra("top_track_10", topTracks);
-
-                Log.e("adapter", "success with " + tracks.tracks.size() + " tracks");
-                Log.e("adapter", "first track is " + tracks.tracks.get(0).name);
+                FragmentTransaction fragmentTransaction = manager.beginTransaction();
+                Fragment fragment = new Top10Fragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("com.ekeitho.top10tracks", topTracks);
+                fragment.setArguments(bundle);
+                fragmentTransaction.hide(manager.findFragmentById(R.id.artist_search_fragment));
+                fragmentTransaction.add(android.R.id.content, fragment, "MyStringIdentifierTag");
+                fragmentTransaction.addToBackStack(null).commit();
+                // sets the title after transaction
+                activity.setTitle("Top 10 Tracks - " + view.getArtistName());
             }
 
             @Override

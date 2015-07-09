@@ -20,11 +20,20 @@ public class ArtistView extends LinearLayout {
 
     private TextView artistName;
     private ImageView albumArt;
+    private String artistId;
 
     public ArtistView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.artist_view_children, this, true);
         setupChildren();
+    }
+
+    public String getArtistId() {
+        return artistId;
+    }
+
+    public String getArtistName() {
+        return artistName.getText().toString();
     }
 
     public ArtistView(Context context) {
@@ -53,5 +62,7 @@ public class ArtistView extends LinearLayout {
         if (artist.images != null && artist.images.size() > 0) {
             Picasso.with(getContext()).load(artist.images.get(0).url).centerCrop().fit().into(albumArt);
         }
+
+        artistId = artist.id;
     }
 }
