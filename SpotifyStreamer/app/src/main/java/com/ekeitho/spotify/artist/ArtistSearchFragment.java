@@ -29,24 +29,31 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("com.ekeitho.artist_array", artistArray);
+        if (artistArray != null ) {
+            outState.putParcelableArrayList("com.ekeitho.artist_array", artistArray);
+        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.artist_search_view, container, false);;
+    public void onCreate(Bundle savedInstanceState) {
         // get activity to use api service
         activity = (SpotifyActivity) getActivity();
-
+        
         // if on first created
         if (savedInstanceState == null && artistArray == null) {
             // populate the layout
             artistArray = new ArrayList<>();
         }
-        // if on rotated
-        else if (savedInstanceState != null && artistArray == null) {
+        // if on rotated or another fragment
+        else if (savedInstanceState != null) {
             artistArray = savedInstanceState.getParcelableArrayList("com.ekeitho.artist_array");
         }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.artist_search_view, container, false);
 
         ListView listView = (ListView) view.findViewById(R.id.artist_found_list);
         SearchView searchView = (SearchView) view.findViewById(R.id.artist_search);
