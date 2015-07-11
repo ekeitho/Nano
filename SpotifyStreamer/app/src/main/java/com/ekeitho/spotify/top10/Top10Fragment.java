@@ -18,34 +18,32 @@ import java.util.ArrayList;
  */
 public class Top10Fragment extends Fragment {
 
+    private static final String TAG = Top10Fragment.class.getSimpleName();
     private ArrayList<TopTrack> tracks;
     private String title = null;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("com.ekeitho.top10tracks", tracks);
-        outState.putString("com.ekeitho.title", title);
+        outState.putParcelableArrayList(getString(R.string.top_tracks_save), tracks);
+        outState.putString(getString(R.string.artist_title_save), title);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // on rotation keep array and title persistent
         if (savedInstanceState != null) {
-            tracks = savedInstanceState.getParcelableArrayList("com.ekeitho.top10tracks");
-            title = savedInstanceState.getString("com.ekeitho.title", "SpotifyActivity");
+            tracks = savedInstanceState.getParcelableArrayList(getString(R.string.top_tracks_save));
+            title = savedInstanceState.getString(
+                    getString(R.string.artist_title_save), // grab this, if not choose default
+                    getString(R.string.title_activity_spotify));
             getActivity().setTitle(title);
         }
-        // on first creation grab, the title
+        // on first creation grab, the title & the arguments passed to the fragment
         else {
             title = getActivity().getTitle().toString();
+            tracks = getArguments().getParcelableArrayList(getString(R.string.tracks_fragment_transfer));
         }
         super.onCreate(savedInstanceState);
-    }
-
-    /* the data is passed through from artistView, when one of artist views are clicked */
-    @Override
-    public void setArguments(Bundle args) {
-        tracks = args.getParcelableArrayList("com.ekeitho.top10tracks");
     }
 
     @Override

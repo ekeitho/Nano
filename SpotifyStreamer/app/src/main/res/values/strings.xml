@@ -4,4 +4,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_spotify">SpotifyActivity</string>
+    <string name="artist_array_save">com.ekeitho.artist_array_save</string>
+    <string name="top_tracks_save">com.ekeitho.top10_tracks_save</string>
+    <string name="artist_title_save">"com.ekeitho.artist_title_save</string>
+    <string name="tracks_fragment_transfer">com.ekeitho.transfer_tracks</string>
+    <string name="top_tracks_title">Top 10 Tracks - </string>
 </resources>

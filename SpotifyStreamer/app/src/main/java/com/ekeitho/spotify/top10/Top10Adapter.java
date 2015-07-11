@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by m652315 on 6/30/15.
  */
-public class Top10Adapter extends ArrayAdapter<TopTrack> implements View.OnClickListener {
+public class Top10Adapter extends ArrayAdapter<TopTrack> {
 
     public Top10Adapter(Context context, ArrayList<TopTrack> tracks) {
         super(context, 0, tracks);
@@ -29,8 +29,4 @@ public class Top10Adapter extends ArrayAdapter<TopTrack> implements View.OnClick
         return top10View;
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
 }

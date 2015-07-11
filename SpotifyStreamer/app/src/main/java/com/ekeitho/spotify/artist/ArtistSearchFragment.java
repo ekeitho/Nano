@@ -23,14 +23,15 @@ import retrofit.client.Response;
 
 public class ArtistSearchFragment extends Fragment implements SearchView.OnQueryTextListener {
 
+    private static final String TAG = ArtistSearchFragment.class.getSimpleName();
     private ArtistSearchAdapter adapter;
     private SpotifyActivity activity;
     private ArrayList<SpotifyArtist> artistArray;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (artistArray != null ) {
-            outState.putParcelableArrayList("com.ekeitho.artist_array", artistArray);
+        if (artistArray != null && outState != null) {
+            outState.putParcelableArrayList(getString(R.string.artist_array_save), artistArray);
         }
     }
 
@@ -38,15 +39,14 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
     public void onCreate(Bundle savedInstanceState) {
         // get activity to use api service
         activity = (SpotifyActivity) getActivity();
-        
+
         // if on first created
         if (savedInstanceState == null && artistArray == null) {
-            // populate the layout
             artistArray = new ArrayList<>();
         }
         // if on rotated or another fragment
         else if (savedInstanceState != null) {
-            artistArray = savedInstanceState.getParcelableArrayList("com.ekeitho.artist_array");
+            artistArray = savedInstanceState.getParcelableArrayList(getString(R.string.artist_array_save));
         }
         super.onCreate(savedInstanceState);
     }
@@ -62,7 +62,8 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
         // acquire the adapter and add it to the list view
         adapter = new ArtistSearchAdapter(getActivity(), artistArray);
         listView.setAdapter(adapter);
-        activity.setTitle("SpotifyActivity");
+        // makes sure if user went from top10fragment and clicked back, the title stays the same
+        activity.setTitle(getString(R.string.title_activity_spotify));
 
         return view;
     }
@@ -78,7 +79,7 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
 
             @Override
             public void failure(RetrofitError error) {
-
+                Log.e(TAG, "Search failed, try again...");
             }
         });
         return false;
@@ -93,12 +94,12 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
         ArrayList<SpotifyArtist> spotifyArtists = new ArrayList<>();
 
         for (Artist artist : artists) {
-            spotifyArtists.add(transform(artist));
+            spotifyArtists.add(transformToSpotifyArtist(artist));
         }
         return spotifyArtists;
     }
 
-    private SpotifyArtist transform(Artist artist) {
+    private SpotifyArtist transformToSpotifyArtist(Artist artist) {
         String url = null;
 
         if (artist.images != null & artist.images.size() > 0) {
