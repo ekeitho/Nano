@@ -39,29 +39,13 @@ public class TopTrack implements Parcelable {
         return trackName;
     }
 
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
-    }
-
-    public void setPreviewURL(String previewURL) {
-        this.previewURL = previewURL;
-    }
-
-    public void setTrackName(String trackName) {
-        this.trackName = trackName;
-    }
-
-    public void setArtThumbnail(String artThumbnail) {
-        this.artThumbnail = artThumbnail;
-    }
-
     @Override
     public int describeContents() {
         return 0;
     }
 
     public TopTrack(Parcel in){
-        String[] data = new String[3];
+        String[] data = new String[4];
         in.readStringArray(data);
         this.trackName = data[0];
         this.albumName = data[1];

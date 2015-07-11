@@ -31,20 +31,19 @@ import retrofit.client.Response;
 /**
  * Created by m652315 on 6/21/15.
  */
-public class ArtistSearchAdapter extends ArrayAdapter<Artist> implements View.OnClickListener {
+public class ArtistSearchAdapter extends ArrayAdapter<SpotifyArtist> implements View.OnClickListener {
 
     private SpotifyActivity activity;
     private ArtistSearchAdapter adapter = this;
     private FragmentManager manager;
     private ArtistView artistView;
 
-    public ArtistSearchAdapter(Context context, ArrayList<Artist> users) {
+    public ArtistSearchAdapter(Context context, ArrayList<SpotifyArtist> users) {
         super(context, 0, users);
         // attach to activity
         activity = (SpotifyActivity)getContext();
         manager = activity.getSupportFragmentManager();
     }
-
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -69,7 +68,7 @@ public class ArtistSearchAdapter extends ArrayAdapter<Artist> implements View.On
             url = track.album.images.get(0).url;
         }
         else {
-            Log.e("TopTrack", "didn't get this song album image: " + track.name);
+            Log.e("SpotifyArtist", "didn't get this song album image: " + track.name);
         }
         return new TopTrack(track.name, track.album.name, url, track.preview_url);
     }

@@ -55,9 +55,9 @@ public class ArtistView extends LinearLayout {
         albumArt = (ImageView) findViewById(R.id.artist_image);
     }
 
-    public void setArtist(Artist artist) {
+    public void setArtist(SpotifyArtist artist) {
         // populate the views
-        artistName.setText(artist.name);
+        artistName.setText(artist.getArtistName());
 
         if (artist.images != null && artist.images.size() > 0) {
             Picasso.with(getContext()).load(artist.images.get(0).url).centerCrop().fit().into(albumArt);

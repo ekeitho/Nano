@@ -28,9 +28,21 @@ public class Top10Fragment extends Fragment {
     private ArrayList<TopTrack> tracks;
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("com.ekeitho.top10tracks", tracks);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            tracks = savedInstanceState.getParcelableArrayList("com.ekeitho.top10tracks");
+        }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public void setArguments(Bundle args) {
         tracks = args.getParcelableArrayList("com.ekeitho.top10tracks");
-        //super.setArguments(args);
     }
 
     @Override

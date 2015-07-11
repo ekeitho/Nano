@@ -49,6 +49,7 @@
             />
 
         <Button
+            android:onClick="displayToast"
             android:layout_marginTop="10dp"
             android:padding="16dp"
             android:id="@+id/myOwnAppButton"

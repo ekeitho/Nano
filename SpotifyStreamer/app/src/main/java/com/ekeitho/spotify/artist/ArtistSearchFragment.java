@@ -25,6 +25,18 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
 
     private ArtistSearchAdapter adapter;
     private SpotifyActivity activity;
+    private ArrayList<SpotifyArtist> artistArray;
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,12 +50,18 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
         // get activity to use api service
         activity = (SpotifyActivity) getActivity();
 
+        if (artistArray == null) {
+            artistArray = new ArrayList<>();
+        }
+
         // acquire the adapter and add it to the list view
-        adapter = new ArtistSearchAdapter(getActivity(), new ArrayList<Artist>());
+        adapter = new ArtistSearchAdapter(getActivity(), artistArray);
         listView.setAdapter(adapter);
 
         return view;
     }
+
+    private ArrayList<SpotifyArtist> artistArrayToSpotifyArray (ArrayList)
 
 
     @Override

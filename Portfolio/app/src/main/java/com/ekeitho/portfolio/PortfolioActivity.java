@@ -1,5 +1,6 @@
 package com.ekeitho.portfolio;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,7 +11,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
-public class PortfolioActivity extends ActionBarActivity implements View.OnClickListener {
+public class PortfolioActivity extends Activity {
 
     private Button spotifyButton;
     private Button scoresAppButton;
@@ -24,21 +25,6 @@ public class PortfolioActivity extends ActionBarActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_portfolio);
 
-        /* access buttons */
-        spotifyButton = (Button) findViewById(R.id.spotifyButton);
-        scoresAppButton = (Button) findViewById(R.id.scoresAppButton);
-        libraryButton = (Button) findViewById(R.id.libraryAppButton);
-        buildBiggerButton = (Button) findViewById(R.id.buildBiggerButton);
-        xyzButton = (Button) findViewById(R.id.xyzButton);
-        myOwnAppButton = (Button) findViewById(R.id.myOwnAppButton);
-        /* set listeners for touch */
-        spotifyButton.setOnClickListener(this);
-        scoresAppButton.setOnClickListener(this);
-        libraryButton.setOnClickListener(this);
-        buildBiggerButton.setOnClickListener(this);
-        xyzButton.setOnClickListener(this);
-        myOwnAppButton.setOnClickListener(this);
-
     }
 
     @Override
@@ -46,13 +32,6 @@ public class PortfolioActivity extends ActionBarActivity implements View.OnClick
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_portfolio, menu);
         return true;
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        /* thanks to the constructive criticism from udacity on this one */
-        displayToast(v);
     }
 
     public void displayToast(View view) {
