@@ -17,6 +17,12 @@ public class ArtistSearchAdapter extends ArrayAdapter<SpotifyArtist> {
         super(context, 0, users);
     }
 
+
+    @Override
+    public void clear() {
+        super.clear();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // get the artist

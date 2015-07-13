@@ -2,10 +2,13 @@ package com.ekeitho.spotify;
 
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ekeitho.spotify.artist.ArtistSearchFragment;
 import com.ekeitho.spotify.artist.ArtistView;
@@ -29,6 +32,7 @@ public class SpotifyActivity extends FragmentActivity {
 
     private static final String TAG = "SpotifyActivity";
     public SpotifyService spotify;
+    private boolean dualPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,20 +41,18 @@ public class SpotifyActivity extends FragmentActivity {
         // populate empty view
         setContentView(R.layout.activity_spotify);
 
-        if (findViewById(R.id.search_fragment_layout) != null) {
+        if (findViewById(R.id.top10_fragment_layout) == null) {
             Log.e(TAG, "normal layout\n");
-        } else if (findViewById(R.id.search_fragment_layout_large) != null) {
-            Log.e(TAG, "large layout\n");
         } else {
+            dualPane = true;
             Log.e(TAG, "uhhhh...");
         }
 
-        if (savedInstanceState == null ) {
+        if (savedInstanceState == null) {
             // start up fragment to easily remove and delete it in transactions
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.search_fragment_layout, new ArtistSearchFragment(), "frag")
-                    .commit();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.search_fragment_layout, new ArtistSearchFragment(), "frag");
+            transaction.commit();
         }
 
 
@@ -70,6 +72,7 @@ public class SpotifyActivity extends FragmentActivity {
         spotify.getArtistTopTrack(view.getArtistId(), map, new Callback<Tracks>() {
             @Override
             public void success(Tracks tracks, Response response) {
+
                 // parceficy the tracks response
                 ArrayList<TopTrack> topTracks = trackToTopTracks(tracks);
 
@@ -80,11 +83,14 @@ public class SpotifyActivity extends FragmentActivity {
                 top10Fragment.setArguments(bundle);
 
                 // remove artist search in replace with top 10 fragment
-                getSupportFragmentManager().beginTransaction()
-                        .remove(getSupportFragmentManager().findFragmentById(R.id.search_fragment_layout))
-                        .add(R.id.search_fragment_layout, top10Fragment, "toptrackfrag")
-                        .addToBackStack(null)
-                        .commit();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (!dualPane) {
+                    transaction.remove(getSupportFragmentManager().findFragmentById(R.id.search_fragment_layout));
+                    transaction.add(R.id.search_fragment_layout, top10Fragment, "toptrackfrag");
+                } else {
+                    transaction.add(R.id.top10_fragment_layout, top10Fragment, "toptrackfrag");
+                }
+                transaction.addToBackStack(null).commit();
 
                 // sets the title after transaction
                 setTitle(getString(R.string.top_tracks_title) + view.getArtistName());
@@ -92,7 +98,7 @@ public class SpotifyActivity extends FragmentActivity {
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e("adapter", "fail");
+                Toast.makeText(getBaseContext(), "No internet, try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }

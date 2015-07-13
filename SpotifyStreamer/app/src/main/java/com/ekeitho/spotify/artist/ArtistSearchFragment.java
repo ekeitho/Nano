@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.ekeitho.spotify.R;
 import com.ekeitho.spotify.SpotifyActivity;
@@ -74,12 +75,16 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
             @Override
             public void success(ArtistsPager artistsPager, Response response) {
                 adapter.clear();
+                if (artistsPager.artists.items.size() == 0) {
+                    Toast.makeText(getActivity(), "No artist available, try again.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 adapter.addAll(artistArrayToSpotifyArray(artistsPager.artists.items));
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e(TAG, "Search failed, try again...");
+                Toast.makeText(getActivity(), "No internet, try again.", Toast.LENGTH_SHORT).show();
             }
         });
         return false;
