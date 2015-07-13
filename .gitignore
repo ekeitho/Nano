@@ -1,6 +1,10 @@
+# personal use
 *.DS_Store
 *.idea/
 *.iml
+*/gradle/*
+*/gradlew*
+*/gradle.properties
 
 # Built application files
 *.apk
