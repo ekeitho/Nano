@@ -18,6 +18,8 @@ import com.ekeitho.spotify.R;
 import com.ekeitho.spotify.top10.TopTrack;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 /**
  * Created by ekeitho on 8/17/15.
  */
@@ -25,17 +27,28 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
 
 
     private static final String ACTION_PLAY = "com.ekeitho.PLAY";
-    private TopTrack track;
+    private static final String ACTION_NEXT = "com.ekeitho.NEXT";
+    private static final String ACTION_PREV = "com.ekeitho.PREV";
+    private ArrayList<TopTrack> tracks;
     private SpotifyPlaybackService spotifyPlaybackService;
-    private ImageView prev, next, playPause;
+    private ImageView prev, next, playPause, albumArt;
+    private TextView artist, album, song;
     private SeekBar seekBar;
     private boolean playing = false;
     boolean mBound = false;
+    private int songPosition = 0;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (getArguments() != null) {
-            track = getArguments().getParcelable("com.ekeitho.toptrack");
+            tracks = getArguments().getParcelableArrayList("com.ekeitho.toptracks");
+            songPosition = getArguments().getInt("com.ekeitho.trackpos");
+            Log.e("AHH", "" + songPosition);
         }
         super.onCreate(savedInstanceState);
     }
@@ -45,10 +58,10 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
         // populate the layout
         View view = inflater.inflate(R.layout.spotify_playback, container, false);
 
-        TextView artist = (TextView) view.findViewById(R.id.playback_artist);
-        TextView album = (TextView) view.findViewById(R.id.playback_album);
-        TextView song = (TextView) view.findViewById(R.id.playback_song);
-        ImageView albumArt = (ImageView) view.findViewById(R.id.playback_album_art);
+        artist = (TextView) view.findViewById(R.id.playback_artist);
+        album = (TextView) view.findViewById(R.id.playback_album);
+        song = (TextView) view.findViewById(R.id.playback_song);
+        albumArt = (ImageView) view.findViewById(R.id.playback_album_art);
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);
         seekBar.setMax(30000);
 
@@ -61,25 +74,38 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
         seekBar.setOnSeekBarChangeListener(this);
 
 
-        if (track != null) {
-            artist.setText(track.getArtistName());
-            album.setText(track.getAlbumName());
-            song.setText(track.getTrackName());
-            Picasso.with(getActivity()).load(track.getArtThumbnail()).fit().centerCrop().into(albumArt);
+        if (tracks.get(songPosition) != null) {
+            fillViews(songPosition);
         }
-
-
         return view;
     }
+
+    private void fillViews(int pos) {
+        TopTrack track = tracks.get(pos);
+        artist.setText(track.getArtistName());
+        album.setText(track.getAlbumName());
+        song.setText(track.getTrackName());
+        Picasso.with(getActivity()).load(track.getArtThumbnail()).fit().centerCrop().into(albumArt);
+    }
+
 
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(getActivity(), SpotifyPlaybackService.class);
+        boolean startFromPause = false;
 
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.prevButton:
+                if (--songPosition < 0) {
+                    songPosition = 9;
+                }
+                fillViews(songPosition);
                 break;
             case R.id.nextButton:
+                if (++songPosition > 9) {
+                    songPosition = 0;
+                }
+                fillViews(songPosition);
                 break;
             case R.id.playButton:
                 if (playing) {
@@ -90,27 +116,28 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
                     playing = true;
                     // change the image
                     playPause.setImageResource(android.R.drawable.ic_media_pause);
-                    intent.setAction(ACTION_PLAY);
-                    intent.putExtra("com.ekeitho.track", track);
 
-                    if (!mBound) {
-                        //create an intent to play, pass in information for the service,
-                        // and have the activity start spotify playback service
-                        getActivity().bindService(intent, mConnection, getActivity().BIND_AUTO_CREATE);
-                    } else {
-                        // happens if a song ends
-                        if (spotifyPlaybackService.mMediaPlayer == null) {
-                            spotifyPlaybackService.startService(intent);
-                        }
-                        // happens if the user hits pause, so the media player is still valid
-                        else {
-                            spotifyPlaybackService.mMediaPlayer.start();
-                        }
+                    if (spotifyPlaybackService != null && spotifyPlaybackService.mMediaPlayer != null) {
+                        spotifyPlaybackService.mMediaPlayer.start();
+                        startFromPause = true;
                     }
-
                 }
                 break;
         }
+
+        intent.setAction(ACTION_PLAY);
+        intent.putExtra("com.ekeitho.track", tracks.get(songPosition));
+        // if it's not bound and user wants to play it, this is their first time trying to use the mediaplayer
+        if (!mBound && playing) {
+            //create an intent to play, pass in information for the service,
+            // and have the activity start spotify playback service
+            getActivity().bindService(intent, mConnection, getActivity().BIND_AUTO_CREATE);
+        }
+        // service is already bound and not coming back from a pause to start state
+        else if (playing && !startFromPause) {
+            spotifyPlaybackService.startService(intent);
+        }
+
     }
 
     @Override
@@ -154,7 +181,9 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
     }
 
 
-    /** Defines callbacks for service binding, passed to bindService() */
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override

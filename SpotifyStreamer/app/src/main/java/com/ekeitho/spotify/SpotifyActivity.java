@@ -38,6 +38,7 @@ public class SpotifyActivity extends FragmentActivity {
     private static final String TAG = "SpotifyActivity";
     public SpotifyService spotify;
     private boolean dualPane = false;
+    private ArrayList<TopTrack> topTracks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,8 @@ public class SpotifyActivity extends FragmentActivity {
 
         SpotifyPlayback playbackFragment = new SpotifyPlayback();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("com.ekeitho.toptrack", song.getTrack());
+        bundle.putInt("com.ekeitho.trackpos", song.getTrackCount());
+        bundle.putParcelableArrayList("com.ekeitho.toptracks", topTracks);
         playbackFragment.setArguments(bundle);
 
 
@@ -94,7 +96,7 @@ public class SpotifyActivity extends FragmentActivity {
             public void success(Tracks tracks, Response response) {
 
                 // parceficy the tracks response
-                ArrayList<TopTrack> topTracks = trackToTopTracks(tracks);
+                topTracks = trackToTopTracks(tracks);
 
                 // initialize top10 fragment with the topTracks
                 Top10Fragment top10Fragment = new Top10Fragment();

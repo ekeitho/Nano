@@ -29,6 +29,8 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
 
     MediaPlayer mMediaPlayer;
     private static final String ACTION_PLAY = "com.ekeitho.PLAY";
+    private static final String ACTION_NEXT = "com.ekeitho.NEXT";
+    private static final String ACTION_PREV = "com.ekeitho.PREV";
     private static final String TAG = SpotifyPlaybackService.class.getSimpleName();
     private static final int NOTIFICATION_ID = 3;
     private TopTrack track;
@@ -59,6 +61,8 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
     }
 
     public void initMediaPlayer(String playbackurl) {
+        // this is called when there is a next/prev called when a song is playing
+        cleanUp();
         // ...initialize the MediaPlayer here...
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -136,11 +140,11 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
     }
 
     private void cleanUp() {
-        stopForeground(true);
         // goodbye media player
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
+            stopForeground(true);
         }
     }
 

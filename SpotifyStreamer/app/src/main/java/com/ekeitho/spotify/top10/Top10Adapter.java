@@ -25,6 +25,7 @@ public class Top10Adapter extends ArrayAdapter<TopTrack> {
         }
 
         top10View.setTrack(getItem(position));
+        top10View.setTrackCount(position);
 
         return top10View;
     }
