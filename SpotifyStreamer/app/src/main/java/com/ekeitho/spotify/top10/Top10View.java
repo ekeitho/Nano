@@ -20,6 +20,12 @@ public class Top10View extends LinearLayout {
     private LinearLayout albumTextLayout;
     private TextView albumName;
     private TextView albumSong;
+    private TopTrack track;
+
+
+    public TopTrack getTrack() {
+        return this.track;
+    }
 
     public Top10View(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -51,6 +57,8 @@ public class Top10View extends LinearLayout {
     public void setTrack(TopTrack track) {
         albumName.setText(track.getAlbumName());
         albumSong.setText(track.getTrackName());
+
+        this.track = track;
 
         Picasso.with(getContext()).load(track.getArtThumbnail()).fit().centerCrop().into(albumImage);
     }

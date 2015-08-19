@@ -15,12 +15,16 @@ public class TopTrack implements Parcelable {
     private String albumName;
     private String artThumbnail;
     private String previewURL;
+    private String artistName;
+    private String trackDuration;
 
-    public TopTrack(String track, String album, String art, String preview) {
+    public TopTrack(String track, String album, String art, String preview, String artist, String duration) {
         this.trackName = track;
         this.albumName = album;
         this.artThumbnail = art;
         this.previewURL = preview;
+        this.artistName = artist;
+        this.trackDuration = duration;
     }
 
     public String getAlbumName() {
@@ -39,18 +43,28 @@ public class TopTrack implements Parcelable {
         return trackName;
     }
 
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public String getTrackDuration() {
+        return trackDuration;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     public TopTrack(Parcel in){
-        String[] data = new String[4];
+        String[] data = new String[6];
         in.readStringArray(data);
         this.trackName = data[0];
         this.albumName = data[1];
         this.artThumbnail = data[2];
         this.previewURL = data[3];
+        this.artistName = data[4];
+        this.trackDuration = data[5];
     }
 
 
@@ -59,7 +73,9 @@ public class TopTrack implements Parcelable {
         dest.writeStringArray(new String[] {this.trackName,
                 this.albumName,
                 this.artThumbnail,
-                this.previewURL});
+                this.previewURL,
+                this.artistName,
+                this.trackDuration});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

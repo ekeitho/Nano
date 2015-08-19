@@ -2,5 +2,6 @@
 <com.ekeitho.spotify.top10.Top10View
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:onClick="goToMedia"
     xmlns:android="http://schemas.android.com/apk/res/android">
 </com.ekeitho.spotify.top10.Top10View>

@@ -21,6 +21,7 @@ public class Top10Fragment extends Fragment {
     private static final String TAG = Top10Fragment.class.getSimpleName();
     private ArrayList<TopTrack> tracks;
     private String title = null;
+    private Top10Adapter adapter;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -53,9 +54,10 @@ public class Top10Fragment extends Fragment {
         ListView listView = (ListView) view.findViewById(R.id.top10_song_found_list);
 
         // acquire the adapter and add it to the list view
-        Top10Adapter adapter = new Top10Adapter(getActivity(), tracks);
+        adapter = new Top10Adapter(getActivity(), tracks);
         listView.setAdapter(adapter);
 
         return view;
     }
+
 }

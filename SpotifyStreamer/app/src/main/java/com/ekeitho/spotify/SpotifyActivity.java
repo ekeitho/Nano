@@ -1,6 +1,8 @@
 package com.ekeitho.spotify;
 
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.app.FragmentActivity;
@@ -12,9 +14,12 @@ import android.widget.Toast;
 
 import com.ekeitho.spotify.artist.ArtistSearchFragment;
 import com.ekeitho.spotify.artist.ArtistView;
+import com.ekeitho.spotify.playback.SpotifyPlayback;
 import com.ekeitho.spotify.top10.Top10Fragment;
+import com.ekeitho.spotify.top10.Top10View;
 import com.ekeitho.spotify.top10.TopTrack;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +64,21 @@ public class SpotifyActivity extends FragmentActivity {
         // start spotify service
         SpotifyApi api = new SpotifyApi();
         spotify = api.getService();
+    }
+
+    public void goToMedia(View v) {
+        Top10View song = (Top10View) v;
+
+        SpotifyPlayback playbackFragment = new SpotifyPlayback();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("com.ekeitho.toptrack", song.getTrack());
+        playbackFragment.setArguments(bundle);
+
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.remove(getSupportFragmentManager().findFragmentById(R.id.search_fragment_layout));
+        transaction.add(R.id.search_fragment_layout, playbackFragment, "playbackfrag");
+        transaction.addToBackStack(null).commit();
     }
 
     // this method is attached from the XML
@@ -109,13 +129,21 @@ public class SpotifyActivity extends FragmentActivity {
 
         for (Track track : tracks.tracks) {
             String url = null;
+            String artistName = null;
 
             if (track.album.images != null && track.album.images.size() > 0) {
                 url = track.album.images.get(0).url;
             } else {
                 Log.e("SpotifyArtist", "didn't get this song album image: " + track.name);
             }
-            topTracks.add(new TopTrack(track.name, track.album.name, url, track.preview_url));
+
+            if (track.artists.size() > 0) {
+                artistName = track.artists.get(0).name;
+            } else {
+                Log.e("SpotifyArtist", "Couldn't find artist name for the track: " + track.name);
+            }
+
+            topTracks.add(new TopTrack(track.name, track.album.name, url, track.preview_url, artistName, "" + track.duration_ms));
         }
         return topTracks;
     }
