@@ -27,8 +27,6 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
 
 
     private static final String ACTION_PLAY = "com.ekeitho.PLAY";
-    private static final String ACTION_NEXT = "com.ekeitho.NEXT";
-    private static final String ACTION_PREV = "com.ekeitho.PREV";
     private ArrayList<TopTrack> tracks;
     private SpotifyPlaybackService spotifyPlaybackService;
     private ImageView prev, next, playPause, albumArt;
@@ -40,17 +38,29 @@ public class SpotifyPlayback extends Fragment implements View.OnClickListener, S
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("com.ekeitho.toptracks", tracks);
+        outState.putInt("com.ekeitho.trackpos", songPosition);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if (getArguments() != null) {
+        if (savedInstanceState != null) {
+            tracks = savedInstanceState.getParcelableArrayList("com.ekeitho.toptracks");
+            songPosition = savedInstanceState.getInt("com.ekeitho.trackpos");
+        } else if (getArguments() != null) {
             tracks = getArguments().getParcelableArrayList("com.ekeitho.toptracks");
             songPosition = getArguments().getInt("com.ekeitho.trackpos");
-            Log.e("AHH", "" + songPosition);
         }
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (spotifyPlaybackService != null) {
+            spotifyPlaybackService.cleanUp();
+        }
+        super.onDestroy();
     }
 
     @Override

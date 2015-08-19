@@ -41,6 +41,12 @@ public class SpotifyActivity extends FragmentActivity {
     private ArrayList<TopTrack> topTracks;
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("com.ekeitho.tracks", topTracks);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -59,6 +65,8 @@ public class SpotifyActivity extends FragmentActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.search_fragment_layout, new ArtistSearchFragment(), "frag");
             transaction.commit();
+        } else {
+            topTracks = savedInstanceState.getParcelableArrayList("com.ekeitho.tracks");
         }
 
 
@@ -115,7 +123,7 @@ public class SpotifyActivity extends FragmentActivity {
                 transaction.addToBackStack(null).commit();
 
                 // sets the title after transaction
-                setTitle(getString(R.string.top_tracks_title) + view.getArtistName());
+                setTitle(getString(R.string.top_tracks_title) + " " + view.getArtistName());
             }
 
             @Override

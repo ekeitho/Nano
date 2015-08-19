@@ -139,7 +139,7 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
         cleanUp();
     }
 
-    private void cleanUp() {
+    public void cleanUp() {
         // goodbye media player
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
