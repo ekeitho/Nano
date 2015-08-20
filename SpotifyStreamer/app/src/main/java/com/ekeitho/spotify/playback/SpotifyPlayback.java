@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Created by ekeitho on 8/17/15.
  */
-public class SpotifyPlayback extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, SpotifyServiceCallback {
+public class SpotifyPlayback extends DialogFragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, SpotifyServiceCallback {
 
 
     private static final String ACTION_PLAY = "com.ekeitho.PLAY";

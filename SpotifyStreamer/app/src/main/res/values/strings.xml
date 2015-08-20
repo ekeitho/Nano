@@ -9,4 +9,6 @@
     <string name="artist_title_save">"com.ekeitho.artist_title_save</string>
     <string name="tracks_fragment_transfer">com.ekeitho.transfer_tracks</string>
     <string name="top_tracks_title">Top 10 Tracks - </string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
 </resources>

@@ -57,7 +57,6 @@ public class SpotifyActivity extends FragmentActivity {
             Log.e(TAG, "normal layout\n");
         } else {
             dualPane = true;
-            Log.e(TAG, "uhhhh...");
         }
 
         if (savedInstanceState == null) {
@@ -84,11 +83,14 @@ public class SpotifyActivity extends FragmentActivity {
         bundle.putParcelableArrayList("com.ekeitho.toptracks", topTracks);
         playbackFragment.setArguments(bundle);
 
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.remove(getSupportFragmentManager().findFragmentById(R.id.search_fragment_layout));
-        transaction.add(R.id.search_fragment_layout, playbackFragment, "playbackfrag");
-        transaction.addToBackStack(null).commit();
+        if (dualPane) {
+            playbackFragment.show(getSupportFragmentManager(), "dialog");
+        } else {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.remove(getSupportFragmentManager().findFragmentById(R.id.search_fragment_layout));
+            transaction.add(R.id.search_fragment_layout, playbackFragment, "playbackfrag");
+            transaction.addToBackStack(null).commit();
+        }
     }
 
     // this method is attached from the XML
@@ -114,14 +116,16 @@ public class SpotifyActivity extends FragmentActivity {
 
                 // remove artist search in replace with top 10 fragment
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                if (!dualPane) {
+                if (dualPane) {
+                    if (getSupportFragmentManager().findFragmentById(R.id.top10_fragment_layout) != null) {
+                        transaction.detach(getSupportFragmentManager().findFragmentById(R.id.top10_fragment_layout));
+                    }
+                    transaction.add(R.id.top10_fragment_layout, top10Fragment, "toptrackfrag");
+                } else {
                     transaction.remove(getSupportFragmentManager().findFragmentById(R.id.search_fragment_layout));
                     transaction.add(R.id.search_fragment_layout, top10Fragment, "toptrackfrag");
-                } else {
-                    transaction.add(R.id.top10_fragment_layout, top10Fragment, "toptrackfrag");
                 }
                 transaction.addToBackStack(null).commit();
-
                 // sets the title after transaction
                 setTitle(getString(R.string.top_tracks_title) + " " + view.getArtistName());
             }
