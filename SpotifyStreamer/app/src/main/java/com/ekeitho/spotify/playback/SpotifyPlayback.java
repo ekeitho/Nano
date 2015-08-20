@@ -36,30 +36,72 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
     private boolean playing = false;
     boolean mBound = false;
     private int songPosition = 0;
+    private Intent startIntent;
+    private int songseek;
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            SpotifyPlaybackService.LocalBinder binder = (SpotifyPlaybackService.LocalBinder) service;
+            spotifyPlaybackService = binder.getService();
+            mBound = true;
+            spotifyPlaybackService.setSpotifyServiceCallback(SpotifyPlayback.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("com.ekeitho.toptracks", tracks);
         outState.putInt("com.ekeitho.trackpos", songPosition);
+        if (spotifyPlaybackService != null && spotifyPlaybackService.mMediaPlayer != null) {
+            outState.putInt("com.ekeitho.songseek", spotifyPlaybackService.mMediaPlayer.getCurrentPosition());
+        }
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        songseek = -1;
+
         if (savedInstanceState != null) {
             tracks = savedInstanceState.getParcelableArrayList("com.ekeitho.toptracks");
             songPosition = savedInstanceState.getInt("com.ekeitho.trackpos");
+            songseek = savedInstanceState.getInt("com.ekeitho.songseek");
         } else if (getArguments() != null) {
             tracks = getArguments().getParcelableArrayList("com.ekeitho.toptracks");
             songPosition = getArguments().getInt("com.ekeitho.trackpos");
         }
+
+        if (!mBound) {
+            startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
+            startIntent.setAction(ACTION_PLAY);
+            startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
+            getActivity().bindService(startIntent, mConnection, getActivity().BIND_AUTO_CREATE);
+        }
         super.onCreate(savedInstanceState);
     }
 
+
     @Override
     public void onDestroy() {
+        Log.e("DESTORY", "AHHHH");
         if (spotifyPlaybackService != null) {
             spotifyPlaybackService.cleanUp();
+        }
+        if (mBound) {
+            getActivity().unbindService(mConnection);
+            mBound = false;
         }
         super.onDestroy();
     }
@@ -88,6 +130,16 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
         if (tracks.get(songPosition) != null) {
             fillViews(songPosition);
         }
+
+        // this happens on rotation and the user is playing something
+        // this will seek to the original spot on rotation and put the pause button
+        if (songseek > -1) {
+            Log.e("TAG", "Song seek more than -1");
+            startIntent.putExtra("com.ekeitho.start", songseek);
+            getActivity().startService(startIntent);
+            playPause.setImageResource(android.R.drawable.ic_media_pause);
+        }
+
         return view;
     }
 
@@ -102,7 +154,6 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(getActivity(), SpotifyPlaybackService.class);
         boolean startFromPause = false;
 
         switch (v.getId()) {
@@ -136,17 +187,9 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
                 break;
         }
 
-        intent.setAction(ACTION_PLAY);
-        intent.putExtra("com.ekeitho.track", tracks.get(songPosition));
         // if it's not bound and user wants to play it, this is their first time trying to use the mediaplayer
-        if (!mBound && playing) {
-            //create an intent to play, pass in information for the service,
-            // and have the activity start spotify playback service
-            getActivity().bindService(intent, mConnection, getActivity().BIND_AUTO_CREATE);
-        }
-        // service is already bound and not coming back from a pause to start state
-        else if (playing && !startFromPause) {
-            spotifyPlaybackService.startService(intent);
+        if (playing && !startFromPause) {
+            spotifyPlaybackService.startService(startIntent);
         }
 
     }
@@ -157,7 +200,7 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
             @Override
             public void run() {
                 //need this catch, because if music stops playing, there is no more media player
-                if (spotifyPlaybackService.mMediaPlayer != null) {
+                if (spotifyPlaybackService != null && spotifyPlaybackService.mMediaPlayer != null) {
                     seekBar.setProgress(spotifyPlaybackService.mMediaPlayer.getCurrentPosition());
                     if (spotifyPlaybackService.mMediaPlayer.getCurrentPosition() < 30000) {
                         seekBar.postDelayed(this, 1000);
@@ -190,28 +233,5 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
     public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
-
-
-    /**
-     * Defines callbacks for service binding, passed to bindService()
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            SpotifyPlaybackService.LocalBinder binder = (SpotifyPlaybackService.LocalBinder) service;
-            spotifyPlaybackService = binder.getService();
-            mBound = true;
-            spotifyPlaybackService.setSpotifyServiceCallback(SpotifyPlayback.this);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
 
 }

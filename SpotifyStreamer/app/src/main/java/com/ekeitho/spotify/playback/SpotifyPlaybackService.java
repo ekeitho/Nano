@@ -35,6 +35,7 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
     private static final int NOTIFICATION_ID = 3;
     private TopTrack track;
     private Bitmap imageIcon;
+    private int songseek = -1;
     private SpotifyServiceCallback spotifyServiceCallback;
 
     // Binder given to clients
@@ -42,7 +43,7 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
 
     @Override
     public IBinder onBind(Intent intent) {
-        startService(intent);
+        Log.e(TAG, "on bind success");
         return mBinder;
     }
 
@@ -50,6 +51,8 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(ACTION_PLAY)) {
             this.track = intent.getParcelableExtra("com.ekeitho.track");
+            this.songseek = intent.getIntExtra("com.ekeitho.start", -1);
+            Log.e(TAG, "" + this.songseek);
             // get the image bitmap from the url which then calls init mediaplayer
             // after successfully getting the image
             new BitmapFromURL().execute(this.track.getArtThumbnail());
@@ -99,7 +102,12 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
                 .build();
 
         // start the player
+        if (songseek != -1) {
+            Log.e(TAG, "SEEKING");
+            mMediaPlayer.seekTo(songseek);
+        }
         mMediaPlayer.start();
+
 
         // calls the seek updater from spotify playback to start updating the progress
         if (spotifyServiceCallback != null) {
