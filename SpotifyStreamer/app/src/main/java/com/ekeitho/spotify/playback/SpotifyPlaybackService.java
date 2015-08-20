@@ -29,8 +29,6 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
 
     MediaPlayer mMediaPlayer;
     private static final String ACTION_PLAY = "com.ekeitho.PLAY";
-    private static final String ACTION_NEXT = "com.ekeitho.NEXT";
-    private static final String ACTION_PREV = "com.ekeitho.PREV";
     private static final String TAG = SpotifyPlaybackService.class.getSimpleName();
     private static final int NOTIFICATION_ID = 3;
     private TopTrack track;
@@ -47,12 +45,14 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
         return mBinder;
     }
 
+    public void setSongseek(int seek) {
+        this.songseek = seek;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(ACTION_PLAY)) {
             this.track = intent.getParcelableExtra("com.ekeitho.track");
-            this.songseek = intent.getIntExtra("com.ekeitho.start", -1);
-            Log.e(TAG, "" + this.songseek);
             // get the image bitmap from the url which then calls init mediaplayer
             // after successfully getting the image
             new BitmapFromURL().execute(this.track.getArtThumbnail());
@@ -103,8 +103,9 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
 
         // start the player
         if (songseek != -1) {
-            Log.e(TAG, "SEEKING");
             mMediaPlayer.seekTo(songseek);
+            //reset songseek
+            songseek = -1;
         }
         mMediaPlayer.start();
 
@@ -153,6 +154,7 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
             mMediaPlayer.release();
             mMediaPlayer = null;
             stopForeground(true);
+            songseek = -1;
         }
     }
 

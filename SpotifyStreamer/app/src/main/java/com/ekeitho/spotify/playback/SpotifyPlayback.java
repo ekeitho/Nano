@@ -31,7 +31,7 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
     private ArrayList<TopTrack> tracks;
     private SpotifyPlaybackService spotifyPlaybackService;
     private ImageView prev, next, playPause, albumArt;
-    private TextView artist, album, song;
+    private TextView artist, album, song, seekStartTime;
     private SeekBar seekBar;
     private boolean playing = false;
     boolean mBound = false;
@@ -111,6 +111,7 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
         artist = (TextView) view.findViewById(R.id.playback_artist);
         album = (TextView) view.findViewById(R.id.playback_album);
         song = (TextView) view.findViewById(R.id.playback_song);
+        seekStartTime = (TextView) view.findViewById(R.id.seekStartTime);
         albumArt = (ImageView) view.findViewById(R.id.playback_album_art);
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);
         seekBar.setMax(30000);
@@ -133,7 +134,7 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
         if (songseek > -1) {
             Log.e("TAG", "Song seek more than -1");
             Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
-            startIntent.putExtra("com.ekeitho.start", songseek);
+            spotifyPlaybackService.setSongseek(songseek);
             startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
             startIntent.setAction(ACTION_PLAY);
             getActivity().startService(startIntent);
@@ -197,6 +198,15 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
 
     }
 
+    private void updateSeekStart(int time) {
+        int sec = time / 1000;
+        if (sec < 10) {
+            seekStartTime.setText("0:0" + sec);
+        } else {
+            seekStartTime.setText("0:" + sec);
+        }
+    }
+
     @Override
     public void seekUpdater() {
         Runnable run = new Runnable() {
@@ -204,13 +214,17 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
             public void run() {
                 //need this catch, because if music stops playing, there is no more media player
                 if (spotifyPlaybackService != null && spotifyPlaybackService.mMediaPlayer != null) {
-                    seekBar.setProgress(spotifyPlaybackService.mMediaPlayer.getCurrentPosition());
-                    if (spotifyPlaybackService.mMediaPlayer.getCurrentPosition() < 30000) {
+                    int time = spotifyPlaybackService.mMediaPlayer.getCurrentPosition();
+                    seekBar.setProgress(time);
+                    updateSeekStart(time);
+
+                    if (time < 30000) {
                         seekBar.postDelayed(this, 1000);
                     }
                 } else {
                     // if no more media player since song ended, reset seek bar and playbutton
                     seekBar.setProgress(0);
+                    seekStartTime.setText("0:00");
                     playing = false;
                     playPause.setImageResource(android.R.drawable.ic_media_play);
                 }
@@ -223,7 +237,12 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {
-            spotifyPlaybackService.mMediaPlayer.seekTo(progress);
+            // do this if music hasn't played but user still wants to seek
+            spotifyPlaybackService.setSongseek(progress);
+            updateSeekStart(progress);
+            if (spotifyPlaybackService.mMediaPlayer != null) {
+                spotifyPlaybackService.mMediaPlayer.seekTo(progress);
+            }
         }
     }
 
