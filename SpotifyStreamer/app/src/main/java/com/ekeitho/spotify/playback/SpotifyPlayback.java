@@ -36,7 +36,6 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
     private boolean playing = false;
     boolean mBound = false;
     private int songPosition = 0;
-    private Intent startIntent;
     private int songseek;
     /**
      * Defines callbacks for service binding, passed to bindService()
@@ -84,9 +83,7 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
         }
 
         if (!mBound) {
-            startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
-            startIntent.setAction(ACTION_PLAY);
-            startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
+            Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
             getActivity().bindService(startIntent, mConnection, getActivity().BIND_AUTO_CREATE);
         }
         super.onCreate(savedInstanceState);
@@ -135,7 +132,10 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
         // this will seek to the original spot on rotation and put the pause button
         if (songseek > -1) {
             Log.e("TAG", "Song seek more than -1");
+            Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
             startIntent.putExtra("com.ekeitho.start", songseek);
+            startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
+            startIntent.setAction(ACTION_PLAY);
             getActivity().startService(startIntent);
             playPause.setImageResource(android.R.drawable.ic_media_pause);
         }
@@ -154,6 +154,7 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
         boolean startFromPause = false;
 
         switch (v.getId()) {
@@ -189,6 +190,8 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
 
         // if it's not bound and user wants to play it, this is their first time trying to use the mediaplayer
         if (playing && !startFromPause) {
+            startIntent.setAction(ACTION_PLAY);
+            startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
             spotifyPlaybackService.startService(startIntent);
         }
 
