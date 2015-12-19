@@ -1,6 +1,7 @@
 package com.ekeitho.spotify;
 
 
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -39,6 +40,8 @@ public class SpotifyActivity extends FragmentActivity {
     public SpotifyService spotify;
     private boolean dualPane = false;
     private ArrayList<TopTrack> topTracks;
+    private ArtistSearchFragment artistSearchFragment;
+    private ArtistView clickedView = null;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -53,6 +56,8 @@ public class SpotifyActivity extends FragmentActivity {
         // populate empty view
         setContentView(R.layout.activity_spotify);
 
+        artistSearchFragment = new ArtistSearchFragment();
+
         if (findViewById(R.id.top10_fragment_layout) == null) {
             Log.e(TAG, "normal layout\n");
         } else {
@@ -62,7 +67,7 @@ public class SpotifyActivity extends FragmentActivity {
         if (savedInstanceState == null) {
             // start up fragment to easily remove and delete it in transactions
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.search_fragment_layout, new ArtistSearchFragment(), "frag");
+            transaction.add(R.id.search_fragment_layout, artistSearchFragment, "frag");
             transaction.commit();
         } else {
             topTracks = savedInstanceState.getParcelableArrayList("com.ekeitho.tracks");
@@ -101,6 +106,7 @@ public class SpotifyActivity extends FragmentActivity {
         // casting looks bleh, but need to get id and name from the view
         final ArtistView view = (ArtistView) v;
 
+
         spotify.getArtistTopTrack(view.getArtistId(), map, new Callback<Tracks>() {
             @Override
             public void success(Tracks tracks, Response response) {
@@ -117,6 +123,11 @@ public class SpotifyActivity extends FragmentActivity {
                 // remove artist search in replace with top 10 fragment
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 if (dualPane) {
+                    //if (clickedView != null) {
+                     //   clickedView.setBackgroundColor(Color.TRANSPARENT);
+                    //}
+                    //clickedView = view;
+                    //view.setBackgroundColor(Color.parseColor("#81B71A"));
                     if (getSupportFragmentManager().findFragmentById(R.id.top10_fragment_layout) != null) {
                         transaction.detach(getSupportFragmentManager().findFragmentById(R.id.top10_fragment_layout));
                     }

@@ -1,11 +1,13 @@
 package com.ekeitho.spotify.artist;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -28,6 +30,7 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
     private ArtistSearchAdapter adapter;
     private SpotifyActivity activity;
     private ArrayList<SpotifyArtist> artistArray;
+    public ListView listView;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -56,13 +59,15 @@ public class ArtistSearchFragment extends Fragment implements SearchView.OnQuery
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.artist_search_view, container, false);
 
-        ListView listView = (ListView) view.findViewById(R.id.artist_found_list);
+        listView = (ListView) view.findViewById(R.id.artist_found_list);
+        listView.setItemsCanFocus(false);
         SearchView searchView = (SearchView) view.findViewById(R.id.artist_search);
         searchView.setOnQueryTextListener(this);
 
         // acquire the adapter and add it to the list view
         adapter = new ArtistSearchAdapter(getActivity(), artistArray);
         listView.setAdapter(adapter);
+
         // makes sure if user went from top10fragment and clicked back, the title stays the same
         activity.setTitle(getString(R.string.title_activity_spotify));
 

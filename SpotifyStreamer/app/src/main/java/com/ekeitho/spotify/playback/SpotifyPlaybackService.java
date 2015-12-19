@@ -1,12 +1,14 @@
 package com.ekeitho.spotify.playback;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -16,6 +18,8 @@ import android.util.Log;
 
 import com.ekeitho.spotify.SpotifyActivity;
 import com.ekeitho.spotify.top10.TopTrack;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +36,6 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
     private static final String TAG = SpotifyPlaybackService.class.getSimpleName();
     private static final int NOTIFICATION_ID = 3;
     private TopTrack track;
-    private Bitmap imageIcon;
     private int songseek = -1;
     private SpotifyServiceCallback spotifyServiceCallback;
 
@@ -53,9 +56,33 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(ACTION_PLAY)) {
             this.track = intent.getParcelableExtra("com.ekeitho.track");
-            // get the image bitmap from the url which then calls init mediaplayer
-            // after successfully getting the image
-            new BitmapFromURL().execute(this.track.getArtThumbnail());
+            initMediaPlayer(track.getPreviewURL());
+
+
+            Target target = new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                    
+                    Notification.Builder mBuilder = new Notification.Builder(getApplicationContext())
+                            .setLargeIcon(bitmap);
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            };
+
+            Picasso.with(this).load(track.getArtThumbnail()).into(target);
         } else {
             Log.v(TAG, "Wasn't action play..");
         }
@@ -92,14 +119,16 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         // create the notification
-        Notification notification = new Notification.Builder(this)
+        Notification.Builder mBuilder = new Notification.Builder(this)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setContentTitle(this.track.getArtistName())
                 .setContentText(this.track.getTrackName())
-                .setLargeIcon(imageIcon)
-                .setContentIntent(pendingIntent)
-                .build();
+                .setContentIntent(pendingIntent);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
         // start the player
         if (songseek != -1) {
@@ -116,7 +145,7 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
         }
 
         // start up the notification
-        startForeground(NOTIFICATION_ID, notification);
+        startForeground(NOTIFICATION_ID, mBuilder.build());
     }
 
     //True if the method handled the error, false if it didn't. Returning false,
@@ -171,31 +200,6 @@ public class SpotifyPlaybackService extends Service implements MediaPlayer.OnCom
         SpotifyPlaybackService getService() {
             // Return this instance of LocalService so clients can call public methods
             return SpotifyPlaybackService.this;
-        }
-    }
-
-    private class BitmapFromURL extends AsyncTask<String, Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            try {
-                URL url = new URL(params[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                return myBitmap;
-            } catch (IOException e) {
-                // Log exception
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            imageIcon = bitmap;
-            initMediaPlayer(track.getPreviewURL());
         }
     }
 }

@@ -50,6 +50,18 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
             spotifyPlaybackService = binder.getService();
             mBound = true;
             spotifyPlaybackService.setSpotifyServiceCallback(SpotifyPlayback.this);
+
+            // this happens on rotation and the user is playing something
+            // this will seek to the original spot on rotation and put the pause button
+            if (songseek > -1) {
+                Log.e("TAG", "Song seek more than -1");
+                Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
+                spotifyPlaybackService.setSongseek(songseek);
+                startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
+                startIntent.setAction(ACTION_PLAY);
+                getActivity().startService(startIntent);
+                playPause.setImageResource(android.R.drawable.ic_media_pause);
+            }
         }
 
         @Override
@@ -80,11 +92,6 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
         } else if (getArguments() != null) {
             tracks = getArguments().getParcelableArrayList("com.ekeitho.toptracks");
             songPosition = getArguments().getInt("com.ekeitho.trackpos");
-        }
-
-        if (!mBound) {
-            Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
-            getActivity().bindService(startIntent, mConnection, getActivity().BIND_AUTO_CREATE);
         }
         super.onCreate(savedInstanceState);
     }
@@ -129,16 +136,9 @@ public class SpotifyPlayback extends DialogFragment implements View.OnClickListe
             fillViews(songPosition);
         }
 
-        // this happens on rotation and the user is playing something
-        // this will seek to the original spot on rotation and put the pause button
-        if (songseek > -1) {
-            Log.e("TAG", "Song seek more than -1");
+        if (!mBound) {
             Intent startIntent = new Intent(getActivity(), SpotifyPlaybackService.class);
-            spotifyPlaybackService.setSongseek(songseek);
-            startIntent.putExtra("com.ekeitho.track", tracks.get(songPosition));
-            startIntent.setAction(ACTION_PLAY);
-            getActivity().startService(startIntent);
-            playPause.setImageResource(android.R.drawable.ic_media_pause);
+            getActivity().bindService(startIntent, mConnection, getActivity().BIND_AUTO_CREATE);
         }
 
         return view;
