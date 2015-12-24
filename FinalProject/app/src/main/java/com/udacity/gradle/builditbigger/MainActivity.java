@@ -22,12 +22,12 @@ import java.io.IOException;
 
 public class MainActivity extends ActionBarActivity {
 
+    String theJoke = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        new EndpointsAsyncTask().execute(new Pair<Context, String>(this, "Manfred"));
     }
 
 
@@ -53,20 +53,20 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view){
-
-        Joker joker = new Joker();
-        Intent intent = new Intent(this, JokePlatform.class);
-        intent.putExtra("com.ekeitho.joke", joker.getJoke());
-        startActivity(intent);
+    public EndpointsAsyncTask getAsyncTask() {
+        return new EndpointsAsyncTask();
     }
 
-    class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+    public void tellJoke(View view){
+        new EndpointsAsyncTask().execute(this);
+    }
+
+    class EndpointsAsyncTask extends AsyncTask<Context, String, String> {
         private MyApi myApiService = null;
         private Context context;
 
         @Override
-        protected String doInBackground(Pair<Context, String>... params) {
+        protected String doInBackground(Context... params) {
             if(myApiService == null) {  // Only do this once
                 MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                         .setRootUrl("https://jokecloud-1168.appspot.com/_ah/api/");
@@ -75,20 +75,25 @@ public class MainActivity extends ActionBarActivity {
                 myApiService = builder.build();
             }
 
-            context = params[0].first;
-            String name = params[0].second;
+            context = params[0];
 
             try {
                 return myApiService.getJokes().execute().getData();
-                //return myApiService.sayHi(name).execute().getData();
             } catch (IOException e) {
                 return e.getMessage();
             }
         }
 
+
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(context, result, Toast.LENGTH_LONG).show();
+            if (context != null) {
+                Joker joker = new Joker();
+                Intent intent = new Intent(context, JokePlatform.class);
+                theJoke = joker.getJoke();
+                intent.putExtra("com.ekeitho.joke", theJoke);
+                startActivity(intent);
+            }
         }
     }
 
