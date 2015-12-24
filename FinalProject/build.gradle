@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0-alpha3'
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -16,4 +15,28 @@ allprojects {
     repositories {
         jcenter()
     }
+}
+
+task start() {
+    dependsOn ":backend:appengineRun"
+}
+
+task runTest() {
+    dependsOn start, ":app:connectedAndroidTest"
+}
+
+
+task stop() {
+    dependsOn runTest, ":backend:appengineStop"
+}
+
+task runAll() {
+    evaluationDependsOn(":backend")
+
+    project(":backend") {
+        appengine {
+            daemon true
+        }
+    }
+    dependsOn stop
 }
