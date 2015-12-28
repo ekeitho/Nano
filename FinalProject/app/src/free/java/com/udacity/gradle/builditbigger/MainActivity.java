@@ -3,14 +3,12 @@ package com.udacity.gradle.builditbigger;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.Joker;
 import com.example.ekeitho.jokeplatform.JokePlatform;
@@ -23,7 +21,7 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import java.io.IOException;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     String theJoke = "";
     private AdView mAdView;
@@ -36,23 +34,15 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // paid & free use different layouts, so we can make this assumption
-        // if the adView visibility is gone, then it's paid,
-        // if the adView visibility is invisible, this it is the free version
-        if (findViewById(R.id.adView).getVisibility() == View.GONE) {
-            free = false;
-        } else {
-            // all free logic should go here
-
-            spinner= (ProgressBar)findViewById(R.id.progressBar);
-            mAdView = (AdView) findViewById(R.id.adView);
-            // Create an ad request. Check logcat output for the hashed device ID to
-            // get test ads on a physical device. e.g.
-            // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
-            adRequest = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .build();
-        }
+        // all free logic should go here
+        spinner = (ProgressBar) findViewById(R.id.progressBar);
+        mAdView = (AdView) findViewById(R.id.adView);
+        // Create an ad request. Check logcat output for the hashed device ID to
+        // get test ads on a physical device. e.g.
+        // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
+        adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
     }
 
 
@@ -83,11 +73,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void tellJoke(View view) {
-        if (free) {
-            spinner.setVisibility(View.VISIBLE);
-            mAdView.setVisibility(View.VISIBLE);
-            mAdView.loadAd(adRequest);
-        }
+        spinner.setVisibility(View.VISIBLE);
+        mAdView.setVisibility(View.VISIBLE);
+        mAdView.loadAd(adRequest);
+
         new EndpointsAsyncTask().execute(this);
     }
 
@@ -123,10 +112,7 @@ public class MainActivity extends ActionBarActivity {
                 theJoke = joker.getJoke();
                 intent.putExtra("com.ekeitho.joke", theJoke);
 
-                if (free) {
-                    spinner.setVisibility(View.GONE);
-                }
-
+                spinner.setVisibility(View.GONE);
                 startActivity(intent);
             }
         }
